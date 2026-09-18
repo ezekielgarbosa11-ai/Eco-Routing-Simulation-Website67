@@ -1,21 +1,6 @@
 // FORMULA FOR EDGE DELAY - FORMULA 3
-function calculateDelay(distance, dataVolume, capacity, congestion) {
-  const propagationSpeed = 2e8; // m/s
-
-  // Propagation delay
-  const propagationDelay = distance / propagationSpeed;
-
-  // Prevent division by zero
-  const availableCapacity = Math.max(
-    capacity * (1 - congestion),
-    capacity * 0.05
-  );
-
-  // Transmission/congestion delay
-  const transmissionDelay = dataVolume / availableCapacity;
-
-  // Total delay
-  return propagationDelay + transmissionDelay;
+function calculateDelay(distance, v, hardwareDelay) {
+  return distance / v + hardwareDelay;
 }
 
 // POWER MODEL - baseline + congestion-dependent + small distance adjustment
@@ -37,6 +22,8 @@ const cef = 0.672;              // kg CO2 per kWh, Philippines grid average
 const packetSize = 1500 * 8;
 const bandwidth = 3.5 * 10 ** 6; // DepEd Order No. 46, s. 2011
 const deltaT = packetSize / bandwidth;
+const v = 2.0 * 10 ** 8;
+const hardwareDelay = 0.0005;
 const distanceFactor = 0.00001; // watts per meter, small realism adjustment
 
 const CARBON_RATIOS = [0.9, 0.7, 0.5]; // fixed budget levels to test
@@ -158,7 +145,7 @@ function runRCSPP() {
   }
 
   const edgeData = rawEdges.map((edge) => {
-    const d_ij = calculateDelay(edge.distance, packetSize, bandwidth, edge.utilization);
+    const d_ij = calculateDelay(edge.distance, v, hardwareDelay);
     const p_ij = calculatePower(basePower, dynamicPower, edge.utilization, edge.distance, distanceFactor);
     const c_ij = calculateCarbon(p_ij, deltaT, cef);
     return { ...edge, edgeDelay: d_ij, carbonCost: c_ij };
@@ -327,7 +314,5 @@ function drawGraph(highlightPath) {
 }
 
 // initial empty state
-document.addEventListener("DOMContentLoaded", () => {
-  renderEdgeList();
-  drawGraph();
-});
+renderEdgeList();
+drawGraph();
