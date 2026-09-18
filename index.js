@@ -24,6 +24,7 @@ const bandwidth = 3.5 * 10 ** 6; // DepEd Order No. 46, s. 2011
 const deltaT = packetSize / bandwidth;
 const v = 2.0 * 10 ** 8;
 const hardwareDelay = 0.0005;
+const distanceFactor = 0.00001; // watts per meter, small realism adjustment
 
 const CARBON_RATIOS = [0.9, 0.7, 0.5]; // fixed budget levels to test
 
