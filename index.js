@@ -4,8 +4,8 @@ function calculateDelay(distance, v, hardwareDelay) {
 }
 
 // POWER MODEL - baseline + congestion-dependent + small distance adjustment
-function calculatePower(basePower, dynamicPower, utilization, distance,) {
-  return basePower + dynamicPower * utilization + distance;
+function calculatePower(basePower, dynamicPower, utilization, distance, distanceFactor) {
+  return basePower + dynamicPower * utilization + distance * distanceFactor;
 }
 
 // FORMULA FOR CARBON COST - FORMULA 4 (unit-corrected: joules -> kWh)
@@ -145,7 +145,7 @@ function runRCSPP() {
 
   const edgeData = rawEdges.map((edge) => {
     const d_ij = calculateDelay(edge.distance, v, hardwareDelay);
-    const p_ij = calculatePower(basePower, dynamicPower, edge.utilization, edge.distance,);
+    const p_ij = calculatePower(basePower, dynamicPower, edge.utilization, edge.distance, distanceFactor);
     const c_ij = calculateCarbon(p_ij, deltaT, cef);
     return { ...edge, edgeDelay: d_ij, carbonCost: c_ij };
   });
